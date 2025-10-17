@@ -18,22 +18,22 @@ exports.handleUpload = async (req, res, next) => {
       return res.status(400).json({ message: 'No valid records found in file', invalidCount: invalid.length });
     }
 
-    const agents = await Agent.find().limit(5);
-    if (agents.length < 5) {
-      return res.status(400).json({ message: 'At least 5 agents are required for distribution' });
-    }
+const agents = await Agent.find().sort({ createdAt: 1 }); 
+if (!agents || agents.length === 0) {
+  return res.status(400).json({ message: 'No agents found. Please add agents before uploading.' });
+}
 
-    const distribution = distributeEqually(valid, agents);
+const distribution = distributeEqually(valid, agents);
 
-    const run = await Run.create({
-      fileName: req.file.originalname,
-      total: valid.length,
-      createdBy: req.admin.id,
-      distributedTo: agents.map((a) => ({
-        agent: a._id,
-        count: distribution[a._id.toString()]?.length || 0
-      }))
-    });
+const run = await Run.create({
+  fileName: req.file.originalname,
+  total: valid.length,
+  createdBy: req.admin.id,
+  distributedTo: agents.map((a) => ({
+    agent: a._id,
+    count: distribution[a._id.toString()]?.length || 0
+  }))
+});
 
     const allLeads = [];
     for (const agentId in distribution) {

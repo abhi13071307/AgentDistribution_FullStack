@@ -13,5 +13,7 @@ const createAgentValidators = [
 router.post('/', auth, createAgentValidators, agentController.createAgent);
 router.get('/', auth, agentController.listAgents);
 router.get('/:id', auth, agentController.getAgent);
+router.delete('/:id', auth, agentController.deleteAgent);
+
 
 module.exports = router;

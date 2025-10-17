@@ -28,6 +28,19 @@ exports.createAgent = async (req, res, next) => {
   }
 };
 
+exports.deleteAgent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const agent = await Agent.findById(id);
+    if (!agent) return res.status(404).json({ message: 'Agent not found' });
+    await Agent.deleteOne({ _id: id });
+
+    res.json({ message: 'Agent deleted successfully', id });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.listAgents = async (req, res, next) => {
   try {
     const agents = await Agent.find().select('-password').sort({ createdAt: -1 });

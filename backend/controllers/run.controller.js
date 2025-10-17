@@ -24,11 +24,9 @@ exports.getLeadsForAgentInRun = async (req, res, next) => {
     const run = await Run.findById(runId);
     if (!run) return res.status(404).json({ message: 'Run not found' });
 
-    // Optional: verify agent exists
     const agent = await Agent.findById(agentId).select('-password');
     if (!agent) return res.status(404).json({ message: 'Agent not found' });
 
-    // Get leads for that run and agent
     const leads = await Lead.find({ run: runId, agent: agentId }).select('-__v').sort({ createdAt: 1 });
 
     res.json({
